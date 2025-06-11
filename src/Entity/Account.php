@@ -24,7 +24,7 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50)]
     private ?string $lastname = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique:true)]
     private ?string $email = null;
 
     /**

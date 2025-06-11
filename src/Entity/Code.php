@@ -25,7 +25,7 @@ class Code
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, unique: true)]
     private ?string $chunk = null;
 
     #[ORM\ManyToOne]
