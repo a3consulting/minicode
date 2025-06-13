@@ -16,6 +16,20 @@ class CodeRepository extends ServiceEntityRepository
         parent::__construct($registry, Code::class);
     }
 
+    /*
+        * @return CodeDTO[] Returns an array of Code objects
+    */
+    public function findAllDTO()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('NEW App\DTO\CodeDTO(c.id, c.title, c.description, l.label, cat.wording, c.createdAt)')
+            ->innerJoin('c.language', 'l')
+            ->innerJoin('c.category', 'cat')
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Code[] Returns an array of Code objects
     //     */
