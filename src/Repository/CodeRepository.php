@@ -22,9 +22,10 @@ class CodeRepository extends ServiceEntityRepository
     public function findAllDTO()
     {
         return $this->createQueryBuilder('c')
-            ->select('NEW App\DTO\CodeDTO(c.id, c.title, c.description, l.label, cat.wording, c.createdAt)')
+            ->select('NEW App\DTO\CodeDTO(c.content, c.description, l.label, cat.wording, a.email, c.chunk)')
             ->innerJoin('c.language', 'l')
             ->innerJoin('c.category', 'cat')
+            ->innerJoin('c.author', 'a')
             ->orderBy('c.id', 'ASC')
             ->getQuery()
             ->getResult();
