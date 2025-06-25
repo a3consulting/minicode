@@ -43,6 +43,9 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $encryptionKey = null;
+
     /**
      * @var Collection<int, Code>
      */
@@ -165,6 +168,18 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getEncryptionKey(): ?string
+    {
+        return $this->encryptionKey;
+    }
+
+    public function setEncryptionKey(?string $encryptionKey): static
+    {
+        $this->encryptionKey = $encryptionKey;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Code>
      */
@@ -187,5 +202,26 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         $this->codes->removeElement($code);
 
         return $this;
+    }
+
+    /**
+     * Dérive une clé de chiffrement à partir du mot de passe utilisateur.
+     * Utilise sodium_crypto_pwhash (Argon2id) si disponible.
+     */
+    public function deriveEncryptionKey(string $password): string
+    {
+        if (function_exists('sodium_crypto_pwhash')) {
+            // Un sel fixe par utilisateur (par exemple, l'email hashé)
+            $salt = hash('sha256', $this->getEmail(), true);
+            return sodium_bin2hex(sodium_crypto_pwhash(
+                SODIUM_CRYPTO_SECRETBOX_KEYBYTES,
+                $password,
+                $salt,
+                SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
+                SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE
+            ));
+        }
+        // Fallback openssl (moins sécurisé)
+        return hash('sha256', $password . $this->getEmail());
     }
 }
